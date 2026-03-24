@@ -31,7 +31,7 @@ Route::get('/dev-login', function () {
 
     if ($voter) {
         Auth::login($voter);
-        return redirect()->route('verification');
+        return redirect()->route('index');
     }
 
     return 'Waduh, user dengan tipe voter tidak ditemukan di database!';
