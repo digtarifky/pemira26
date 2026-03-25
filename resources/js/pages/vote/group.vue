@@ -64,16 +64,18 @@ const submit = () => {
 </script>
 
 <template>
-    <div class="min-h-dvh flex justify-center p-4">
-        <div class="max-w-screen-xl w-full space-y-4">
-            <Card>
-                <CardHeader class="text-center">
-                    <CardTitle>{{ group.name }}</CardTitle>
-                    <CardDescription>
-                        Pilihlah {{ group.min_candidates }} kandidat di bawah
-                        ini!
+   <div class="min-h-dvh flex justify-center p-4 sm:p-6 lg:p-8 bg-blue-800 bg-[url('/background.webp')] bg-cover bg-center bg-fixed font-sans relative">
+        
+        <div class="max-w-screen-xl w-full space-y-4 relative z-10">
+            <Card class="bg-white/10 backdrop-blur-lg border border-white/20 shadow-2xl">
+                
+                <CardHeader class="text-center border-b border-white/20 pb-6">
+                    <CardTitle class="text-3xl font-extrabold text-white">{{ group.name }}</CardTitle>
+                    <CardDescription class="text-gray-200 text-lg mt-1">
+                        Pilihlah {{ group.min_candidates }} kandidat di bawah ini!
                     </CardDescription>
-                    <div class="flex justify-center gap-2">
+                    
+                    <div class="flex justify-center gap-4 mt-6">
                         <Link
                             :href="
                                 route('vote.group.previous', {
@@ -82,41 +84,53 @@ const submit = () => {
                                 })
                             "
                         >
-                            <Button variant="outline">Kembali</Button>
+                            <Button variant="ghost" class="bg-white/10 backdrop-blur-lg border border-white/10 text-white rounded-full px-8 shadow-lg hover:bg-white/20 transition-all">
+                                Kembali
+                            </Button>
                         </Link>
-                        <Button :disabled="!selected" @click="submit">
+                        
+                        <Button :disabled="!selected" @click="submit" class="bg-[#FF8A00] hover:bg-[#e07a00] text-white border-none font-bold rounded-full px-8 shadow-lg disabled:bg-gray-400 disabled:opacity-70">
                             Selanjutnya
                         </Button>
                     </div>
+                    
                     <div
                         v-if="form.errors.candidate_ids"
-                        class="text-destructive text-sm font-medium"
+                        class="text-red-400 text-sm font-bold mt-4 drop-shadow-md"
                     >
                         {{ form.errors.candidate_ids }}
                     </div>
                 </CardHeader>
-                <CardContent>
-                    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+
+                <CardContent class="pt-6">
+                    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        
                         <Card
                             v-for="(candidate, number) in candidates"
-                            :class="{
-                                outline: selected.includes(candidate.id),
-                            }"
-                            class="aspect-square cursor-pointer overflow-hidden"
+                            :class="[
+                                selected.includes(candidate.id) 
+                                    ? 'ring-4 ring-[#FF8A00] bg-white/30 scale-[1.02] shadow-xl border-transparent' 
+                                    : 'border-white/20 bg-white/10 hover:bg-white/20 hover:scale-[1.01] shadow-lg',
+                                'transition-all duration-300 backdrop-blur-md aspect-square cursor-pointer overflow-hidden'
+                            ]"
                             @click="select(candidate.id)"
                         >
-                            <div class="size-full grid grid-cols-2 divide-x">
-                                <div>
-                                    <div class="relative">
+                            <div class="size-full grid grid-cols-2 divide-x divide-white/20">
+                                
+                                <div class="flex flex-col h-full">
+                                    <div class="relative grow overflow-hidden">
                                         <div
-                                            class="absolute bottom-4 left-4 size-8 flex items-center justify-center shadow bg-white border rounded-full text-lg font-bold"
+                                            class="absolute bottom-2 left-2 size-8 flex items-center justify-center shadow-md bg-[#FF8A00] text-white rounded-full text-lg font-bold z-10"
                                         >
                                             {{ number + 1 }}
                                         </div>
-                                        <img :src="`/storage/${candidate.picture}`.replace('storage//', 'storage/')" />
+                                        <img 
+                                            :src="`/storage/${candidate.picture}`.replace('storage//', 'storage/')" 
+                                            class="w-full h-full object-cover absolute inset-0" 
+                                        />
                                     </div>
-                                    <CardHeader class="p-4 text-sm">
-                                        <CardTitle class="leading-normal">
+                                    <CardHeader class="p-4 text-center border-t border-white/20 shrink-0 bg-black/20">
+                                        <CardTitle class="leading-normal text-white text-sm lg:text-base font-bold drop-shadow-md">
                                             {{ candidate.name_1 }}
                                             <template v-if="candidate.name_2">
                                                 <br />
@@ -127,30 +141,30 @@ const submit = () => {
                                         </CardTitle>
                                     </CardHeader>
                                 </div>
+                                
                                 <div class="overflow-y-auto">
-                                    <CardHeader class="p-4">
+                                    <CardHeader class="p-4 pb-2">
                                         <CardDescription
-                                            class="text-foreground text-xs"
+                                            class="text-white font-bold text-xs uppercase tracking-wider mb-1"
                                         >
                                             Visi
                                         </CardDescription>
                                         <pre
-                                            class="font-sans text-xs text-muted-foreground text-wrap"
-                                            >{{ candidate.vision }}</pre
-                                        >
+                                            class="font-sans text-xs text-gray-200 text-wrap whitespace-pre-wrap"
+                                        >{{ candidate.vision }}</pre>
                                     </CardHeader>
-                                    <CardContent class="px-4 pb-4">
+                                    <CardContent class="px-4 pb-4 border-t border-white/10 mt-2 pt-2">
                                         <CardDescription
-                                            class="text-foreground text-xs"
+                                            class="text-white font-bold text-xs uppercase tracking-wider mb-1"
                                         >
                                             Misi
                                         </CardDescription>
                                         <pre
-                                            class="font-sans text-xs text-muted-foreground text-wrap"
-                                            >{{ candidate.mission }}</pre
-                                        >
+                                            class="font-sans text-xs text-gray-200 text-wrap whitespace-pre-wrap"
+                                        >{{ candidate.mission }}</pre>
                                     </CardContent>
                                 </div>
+
                             </div>
                         </Card>
                     </div>
