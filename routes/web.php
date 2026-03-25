@@ -25,20 +25,6 @@ use Inertia\Inertia;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
-Route::get('/dev-login', function () {
-    // Mengambil user urutan pertama dari database
-    $voter = User::where('type', 'voter')->first(); 
-
-    if ($voter) {
-        Auth::login($voter);
-        return redirect()->route('index');
-    }
-
-    return 'Waduh, user dengan tipe voter tidak ditemukan di database!';
-});
-//coba bagian akhir 
-
-
 Route::middleware("guest")->group(function () {
     Route::get("/login", fn() => Inertia::render("login"))->name("login");
     Route::get("/auth/redirect", [AuthController::class, "redirect"])
