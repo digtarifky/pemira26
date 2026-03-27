@@ -45,7 +45,7 @@ class UserController extends Controller
             "type" => "required|in:admin,committee,voter",
             "name" => "required",
             "email" => "required",
-            "npm" => "required",
+            "npm" => "required|string|max:11",
         ]);
 
         $npm = $request->input("npm");
@@ -61,7 +61,8 @@ class UserController extends Controller
         Whitelist::query()->firstOrCreate(["npm" => $request->input("npm")]);
 
         return redirect(route("admin.users.index", ["type" => $user->type]))
-            ->with("flash.message", "User has been added.");
+            ->with("flash.message", "User has been added.")
+            ->with("flash.type", "success");
     }
 
     /**
@@ -87,9 +88,9 @@ class UserController extends Controller
     {
         $request->validate([
             "type" => "required|in:admin,committee,voter",
-            "npm" => "required",
-            "email" => "required",
-            "name" => "required",
+            "name" => "required|string|max:255",
+           "email" => "required|email|max:255|unique:users,email," . $user->id,
+            "npm" => "required|string|max:11|unique:users,npm," . $user->id,
         ]);
 
         $npm = $request->input("npm");
@@ -105,7 +106,8 @@ class UserController extends Controller
         Whitelist::query()->firstOrCreate(["npm" => $request->input("npm")]);
 
         return redirect(route("admin.users.index", ["type" => $user->type]))
-            ->with("flash.message", "User has been updated.");
+            ->with("flash.message", "User has been updated.")
+            ->with("flash.type", "success");
     }
 
     /**
@@ -115,6 +117,7 @@ class UserController extends Controller
     {
         $user->delete();
         return redirect(route("admin.users.index", ["type" => $user->type]))
-            ->with("flash.message", "User {$user->name} has been deleted.");
+            ->with("flash.message", "User {$user->name} has been deleted.")
+            ->with("flash.type", "success");
     }
 }

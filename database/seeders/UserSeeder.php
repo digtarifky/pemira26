@@ -44,5 +44,21 @@ class UserSeeder extends Seeder
             "name" => "Evelin",
             "type" => "admin",
         ]);
+        User::query()->create([
+            "npm" => "24082010012",
+            "email" => "24082010012@student.upnjatim.ac.id",
+            "major" => "20",
+            "year" => "24",
+            "name" => "Azarya",
+            "type" => "admin",
+        ]);
+        User::query()->create([
+            "npm" => "24082010235",
+            "email" => "24082010235@student.upnjatim.ac.id",
+            "major" => "20",
+            "year" => "24",
+            "name" => "Digta",
+            "type" => "admin",
+        ]);
     }
 }

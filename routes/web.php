@@ -54,8 +54,9 @@ Route::middleware("auth")->group(function () {
             ->name("whitelists.store.single");
 
         Route::resource("users", UserController::class);
-        Route::resource("organizations", OrganizationController::class);
-
+        Route::resource("organizations", OrganizationController::class)->except([
+             'store'
+        ]); 
         Route::resource("organizations.groups", GroupController::class);
         Route::resource(
             "organizations.groups.candidates",
