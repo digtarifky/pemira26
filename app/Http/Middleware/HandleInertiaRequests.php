@@ -59,6 +59,8 @@ class HandleInertiaRequests extends Middleware
             "flash" => $request->session()->get("flash.message") ? [
                 "message" => $request->session()->get("flash.message"),
                 "type" => $request->session()->get("flash.type", "default"),
+                "default" => $request->session()->get('success'),
+                "destructive" => $request->session()->get('destructive'),
             ] : null,
             "organizations" => $request->user()?->type === "admin" ?
                 Organization::orderBy("ordering")->get() :

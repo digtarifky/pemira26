@@ -105,11 +105,19 @@ class OrganizationSeeder extends Seeder
             ]
         ]);
 
-        // $blj->groups()->create([
-        //     "name" => "BLM Bisnis Digital",
-        //     "major" => 40,
-        //     "ordering" => 1,
-        // ])->candidates()->createMany([
+        $bem->groups()->create([
+            "name" => "BLM Bisnis Digital",
+            "major" => 40,
+            "ordering" => 1,
+        ])->candidates()->createMany([
+             [
+                "organization_id" => $bem->id,
+                "name_1" => "Rashad Nawfal Pradipa",
+                "vision" => "Terwujudnya Badan Legislatif Mahasiswa Fakultas Ilmu Komputer yang representatif, kolaboratif, independen, dan inovatif dalam menyuarakan aspirasi mahasiswa serta aktif dalam mendorong terciptanya lingkungan akademik yang berkualitas, inklusif, dan berkelanjutan.",
+                "mission" => "1. Menyelenggarakan forum diskusi rutin untuk menjaring aspirasi mahasiswa\n2. Membuat aplikasi berbasis web untuk memudahkan mahasiswa dalam menyampaikan aspirasi\n3. Mengadakan kompetisi inovasi untuk mahasiswa\n4. Menjalin kerjasama dengan perusahaan teknologi untuk pengembangan program magang\n5. Mengkampanyekan pentingnya keberagaman dan inklusivitas di kampus.",
+                "picture" => "/blmsada1.jpg",
+            ]
+        ]);
         //     [
         //         "organization_id" => $blj->id,
         //         "name_1" => "Candidate 1",

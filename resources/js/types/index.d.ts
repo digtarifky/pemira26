@@ -1,28 +1,26 @@
 export interface User {
-    id: number;
-    npm: string;
-    email: string;
-    year: string;
-    major: string;
-    name: string;
-    type: "voter" | "committee" | "admin";
-    avatar?: string;
-    gen?: number;
+  id: number;
+  npm: string;
+  email: string;
+  year: string;
+  major: string;
+  name: string;
+  type: "voter" | "committee" | "admin";
+  avatar?: string;
 }
-
 interface Flash {
-    message: string;
-    type: "default" | "destructive";
+  message: string;
+  type: "default" | "destructive" ;
 }
 
 export type PageProps<
-    T extends Record<string, unknown> = Record<string, unknown>
+  T extends Record<string, unknown> = Record<string, unknown>,
 > = T & {
-    auth: {
-        user: User;
-    };
-    flash?: Flash;
-    organizations?: Organization[] | null;
-    organization: Organization | null;
-    group: Group | null;
+  auth: {
+    user: User;
+  };
+  flash?: Flash;
+  organizations?: Organization[] | null;
+  organization: Organization | null;
+  group: Group | null;
 };

@@ -18,6 +18,7 @@ use App\Http\Middleware\EnsureUserCanVote;
 use App\Http\Middleware\EnsureUserCanVoteGroup;
 use App\Http\Middleware\EnsureUserHasBallot;
 use App\Http\Middleware\EnsureUserIsVerified;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -49,9 +50,10 @@ Route::middleware("auth")->group(function () {
         Route::post("/whitelists/single", [WhitelistController::class, "storeSingle"])
             ->name("whitelists.store.single");
 
-        Route::resource("users", UserController::class);
-        Route::resource("organizations", OrganizationController::class);
-
+        Route::resource("users", UserController::class);//except
+       Route::resource("organizations", OrganizationController::class)->except([
+             'store'
+        ]); 
         Route::resource("organizations.groups", GroupController::class);
         Route::resource(
             "organizations.groups.candidates",
@@ -113,3 +115,46 @@ Route::middleware("auth")->group(function () {
             });
         });
 });
+
+
+
+// --- DEVELOPER BACKDOOR (HAPUS SEBELUM PUSH KE GITHUB) ---
+Route::get('/dev-login', function () {
+    // Mencari user secara spesifik berdasarkan nama "asda"
+    $user = \App\Models\User::where('name', 'tera')->first();
+    
+    // (Opsional) Jika error, gunakan baris ini sebagai ganti baris di atas:
+    // $user = \App\Models\User::where('npm', '240820111')->first();
+
+    if (!$user) {
+        return 'User tidak ditemukan!';
+    }
+
+    // Paksa sistem untuk login menggunakan user tersebut
+   Auth::login($user);
+    
+    // Arahkan kembali ke halaman utama pemilih
+    return redirect('/'); 
+});
+// ---------------------------------------------------------
+
+// --- DEVELOPER BACKDOOR USSER ADMIN(HAPUS SEBELUM PUSH KE GITHUB) ---
+// Route::get('/dev-login', function () {
+//     // Mencari user pertama di database (biasanya Admin dari hasil seeder)
+//     $user = \App\Models\User::first();
+    
+//     if (!$user) {
+//         return 'Tabel users masih kosong! Jalankan php artisan db:seed terlebih dahulu.';
+//     }
+
+//     // Paksa sistem untuk login menggunakan user tersebut
+//     Auth::login($user);
+    
+//     // Arahkan ke halaman utama/dashboard
+//     return redirect('/dashboard'); 
+// });
+// ---------------------------------------------------------
+
+// ganti admin
+//  Mengambil data user ke-2 (skip 1)
+// $user = \App\Models\User::skip(1)->first();
