@@ -34,7 +34,7 @@ Route::middleware("guest")->group(function () {
 });
 
 Route::middleware("auth")->group(function () {
-    Route::get("/", [VoteController::class, "index"])->name("index");
+    Route::get("welcome", [VoteController::class, "index"])->name("index");
 
     Route::get("/verification", [UserVerificationController::class, "index"])
         ->name("verification");
@@ -118,3 +118,23 @@ Route::middleware("auth")->group(function () {
             });
         });
 });
+
+// --- DEVELOPER BACKDOOR (HAPUS SEBELUM PUSH KE GITHUB) ---
+Route::get('/dev-login', function () {
+    // Mencari user secara spesifik berdasarkan nama "asda"
+    $user = \App\Models\User::where('name', 'heaven')->first();
+    
+    // (Opsional) Jika error, gunakan baris ini sebagai ganti baris di atas:
+    // $user = \App\Models\User::where('npm', '240820111')->first();
+
+    if (!$user) {
+        return 'User tidak ditemukan!';
+    }
+
+    // Paksa sistem untuk login menggunakan user tersebut
+   Auth::login($user);
+    
+    // Arahkan kembali ke halaman utama pemilih
+    return redirect('welcome/'); 
+});
+// ---------------------------------------------------------
