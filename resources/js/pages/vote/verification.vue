@@ -34,27 +34,31 @@ const verificationInput = ref<HTMLInputElement | null>(null);
 
 const handleInput = (e: Event) => {
   const target = e.target as HTMLInputElement;
+  const file = target.files?.[0];
+
+  if (!file) return;
+
+  const maxSizeInMB = 5;
+  if (file.size > maxSizeInMB * 1024 * 1024) {
+    alert(`Ukuran file terlalu besar! Maksimal ${maxSizeInMB}MB.`);
+    target.value = "";
+    return;
+  }
 
   if (target === ktmInput.value) {
-    form.ktm = target.files?.[0];
-
-    if (form.ktm) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        urls.ktm = e.target?.result as string;
-      };
-      reader.readAsDataURL(form.ktm);
-    }
+    form.ktm = file;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      urls.ktm = e.target?.result as string;
+    };
+    reader.readAsDataURL(form.ktm);
   } else {
-    form.verification = target.files?.[0];
-
-    if (form.verification) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        urls.verification = e.target?.result as string;
-      };
-      reader.readAsDataURL(form.verification);
-    }
+    form.verification = file;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      urls.verification = e.target?.result as string;
+    };
+    reader.readAsDataURL(form.verification);
   }
 };
 
