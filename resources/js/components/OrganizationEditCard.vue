@@ -20,6 +20,7 @@ const props = defineProps<{
 }>();
 
 const form = useForm({
+  _method: "put",
   logo: <File | undefined>undefined,
   major: props.organization.major ?? "",
   name: props.organization.name,
@@ -67,7 +68,7 @@ const remove = () => {
       <form
         class="space-y-4"
         @submit.prevent="
-          form.put(
+          form.post(
             route('admin.organizations.update', {
               organization: props.organization.id,
             }),

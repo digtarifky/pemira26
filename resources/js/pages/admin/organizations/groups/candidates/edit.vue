@@ -40,6 +40,7 @@ const organization = page.props.organization;
 const group = page.props.group;
 
 const form = useForm({
+  _method: "put",
   picture: <File | undefined>undefined,
   name_1: props.candidate.name_1,
   name_2: props.candidate.name_2,
@@ -109,7 +110,7 @@ const setLogo = (event: Event) => {
         <form
           class="space-y-4"
           @submit.prevent="
-            form.put(
+            form.post(
               route('admin.organizations.groups.candidates.update', {
                 organization: organization?.id,
                 group: group?.id,
