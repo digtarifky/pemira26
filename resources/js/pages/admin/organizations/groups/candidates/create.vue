@@ -51,7 +51,7 @@ const setLogo = (event: Event) => {
   form.picture = target.files?.[0];
 
   if (form.picture) {
-    const reader = new FileReader();
+    const reader = new FileReader();  
     reader.onload = (e) => {
       pictureURL.value = e.target?.result as string;
     };
