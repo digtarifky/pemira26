@@ -169,7 +169,7 @@ const submit = () => {
                     >
                   </CardHeader>
                   <CardContent
-                    class="px-4 pb-4 border-t border-white/10 mt-2 pt-2"
+                    class="px-4 pb-4 border-t border-white/10 mt-2 pt-2 flex-1"
                   >
                     <CardDescription
                       class="text-white font-bold text-xs uppercase tracking-wider mb-1"
