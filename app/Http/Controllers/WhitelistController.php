@@ -27,24 +27,42 @@ class WhitelistController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-    {
-        $request->validate([
-            'whitelists' => 'required',
-        ]);
-        $whitelist = preg_split("/\r\n|\n|\r/", $request->whitelists);
-        Whitelist::query()->whereDoesntHave('user')->delete();
-        Whitelist::query()->whereHas('user', function ($query) {
-            $query->where('type', 'voter');
-        })->delete();
-        foreach ($whitelist as $npm) {
-            Whitelist::query()->firstOrCreate([
-                'npm' => $npm,
-            ]);
-        }
-        return redirect(route("admin.whitelists.index"))
-            ->with("flash.message", "Whitelist updated");
+ public function store(Request $request)
+{
+    $request->validate([
+        'whitelists' => 'required',
+    ]);
+
+    // 1. Bersihkan input: pecah baris, hilangkan spasi, buang baris yang kosong
+    $rawNpms = preg_split("/\r\n|\n|\r/", $request->whitelists);
+    $cleanNpms = array_filter(array_map('trim', $rawNpms));
+
+    // 2. Eksekusi penghapusan data lama (Tetap gunakan logika asli Anda)
+    // Whitelist::query()->whereDoesntHave('user')->delete();
+    // Whitelist::query()->whereHas('user', function ($query) {
+    //     $query->where('type', 'voter');
+    // })->delete();
+
+    // 3. Rakit data menjadi format Array Multidimensi
+    $insertData = [];
+    $now = now();
+    foreach ($cleanNpms as $npm) {
+        $insertData[] = [
+            'npm' => $npm,
+            'created_at' => $now,
+            'updated_at' => $now,
+        ];
     }
+
+    // 4. BULK INSERT MAGIC: Masukkan per 1000 baris sekaligus
+    foreach (array_chunk($insertData, 1000) as $chunk) {
+        // insertOrIgnore akan mengabaikan data duplikat secara efisien
+        Whitelist::insertOrIgnore($chunk);
+    }
+
+    return redirect(route("admin.whitelists.index"))
+        ->with("flash.message", "Mass Whitelists updated!");
+}
 
     public function storeSingle(Request $request)
     {
