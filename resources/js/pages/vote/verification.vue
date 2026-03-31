@@ -74,14 +74,14 @@ const submit = () => {
     ref="ktmInput"
     type="file"
     class="absolute -top-full -left-full"
-    accept="image/jpeg, image/png, image/webp"
+    accept="image/*"
     @change="handleInput"
   />
   <input
     ref="verificationInput"
     type="file"
     class="absolute -top-full -left-full"
-    accept="image/jpeg, image/png, image/webp"
+    accept="image/*"
     @change="handleInput"
   />
 
