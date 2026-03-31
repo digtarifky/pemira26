@@ -28,6 +28,7 @@ const urls = reactive<{
   ktm: "",
   verification: "",
 });
+const errorMessage = ref<string | null>(null);
 
 const ktmInput = ref<HTMLInputElement | null>(null);
 const verificationInput = ref<HTMLInputElement | null>(null);
@@ -36,6 +37,7 @@ const handleInput = (e: Event) => {
   const target = e.target as HTMLInputElement;
   const file = target.files?.[0];
 
+  errorMessage.value = null;
   if (!file) return;
 
   const maxSizeInMB = 5;
@@ -44,27 +46,51 @@ const handleInput = (e: Event) => {
     target.value = "";
     return;
   }
+  // Proses Baca File dengan Error Handling
+  try {
+    const reader = new FileReader();
 
-  if (target === ktmInput.value) {
-    form.ktm = file;
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      urls.ktm = e.target?.result as string;
+    // Tangkap jika browser HP gagal membaca file (corrupt/unsupported)
+    reader.onerror = () => {
+      errorMessage.value =
+        "Gagal membaca foto. Pastikan format gambar normal atau coba ambil foto ulang.";
+      target.value = "";
     };
-    reader.readAsDataURL(form.ktm);
-  } else {
-    form.verification = file;
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      urls.verification = e.target?.result as string;
+
+    reader.onload = (event) => {
+      if (target === ktmInput.value) {
+        form.ktm = file;
+        urls.ktm = event.target?.result as string;
+      } else {
+        form.verification = file;
+        urls.verification = event.target?.result as string;
+      }
     };
-    reader.readAsDataURL(form.verification);
+
+    reader.readAsDataURL(file);
+  } catch (error) {
+    errorMessage.value =
+      "Terjadi kesalahan sistem pada perangkat Anda. Coba *refresh* halaman.";
   }
 };
 
 const submit = () => {
+  errorMessage.value = null;
   if (form.ktm && form.verification) {
-    form.post(route("verification.store"));
+    form.post(route("verification.store"), {
+      preserveScroll: true,
+      onError: (errors) => {
+        // Tangkap pesan error spesifik dari validasi Laravel
+        if (errors.ktm) {
+          errorMessage.value = `KTM: ${errors.ktm}`;
+        } else if (errors.verification) {
+          errorMessage.value = `Wajah: ${errors.verification}`;
+        } else {
+          errorMessage.value =
+            "Server gagal memproses gambar. Coba lagi dalam beberapa saat.";
+        }
+      },
+    });
   }
 };
 </script>
@@ -74,14 +100,14 @@ const submit = () => {
     ref="ktmInput"
     type="file"
     class="absolute -top-full -left-full"
-    accept="image/jpeg, image/png, image/webp"
+    accept="image/*"
     @change="handleInput"
   />
   <input
     ref="verificationInput"
     type="file"
     class="absolute -top-full -left-full"
-    accept="image/jpeg, image/png, image/webp"
+    accept="image/*"
     @change="handleInput"
   />
 
@@ -98,6 +124,26 @@ const submit = () => {
       class="relative z-10 flex-1 flex flex-col items-center pt-20 pb-12 px-6 w-full"
     >
       <div class="max-w-md w-full space-y-4">
+        <div
+          v-if="errorMessage"
+          class="bg-red-500/10 border border-red-500/50 backdrop-blur-md rounded-xl p-4 flex items-center gap-3 animate-in fade-in slide-in-from-top-4"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="size-6 text-red-400 shrink-0"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+            />
+          </svg>
+          <p class="text-white text-sm font-medium">{{ errorMessage }}</p>
+        </div>
         <Card
           class="bg-white/10 backdrop-blur-lg border border-white/10 rounded-2xl shadow-xl overflow-hidden"
         >
