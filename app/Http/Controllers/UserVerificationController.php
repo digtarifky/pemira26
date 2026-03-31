@@ -22,8 +22,8 @@ class UserVerificationController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            "ktm" => "required|mimes:jpeg,png,jpg,webp|max:5120", // Maks 5MB
-            "verification" => "required|mimes:jpeg,png,jpg,webp|max:5120", // Maks 5MB
+            "ktm" => "required|mimes:jpeg,png,jpg,webp|max:10000", // Maks 10MB
+            "verification" => "required|mimes:jpeg,png,jpg,webp|max:10000", // Maks 10MB
         ]);
 
         $ktm = Storage::disk("public")->put("ktms", $request->file("ktm"));
