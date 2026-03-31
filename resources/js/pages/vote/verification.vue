@@ -12,7 +12,7 @@ import {
 import { Link, useForm } from "@inertiajs/vue3";
 import { BookImage } from "lucide-vue-next";
 import { reactive, ref } from "vue";
-
+import imageCompression from "browser-image-compression";
 const form = useForm<{
   ktm: File | undefined;
   verification: File | undefined;
@@ -29,48 +29,42 @@ const urls = reactive<{
   verification: "",
 });
 const errorMessage = ref<string | null>(null);
+const isCompressing = ref<boolean>(false);
 
 const ktmInput = ref<HTMLInputElement | null>(null);
 const verificationInput = ref<HTMLInputElement | null>(null);
 
-const handleInput = (e: Event) => {
+const handleInput = async (e: Event) => {
   const target = e.target as HTMLInputElement;
   const file = target.files?.[0];
 
   errorMessage.value = null;
   if (!file) return;
 
-  const maxSizeInMB = 5;
-  if (file.size > maxSizeInMB * 1024 * 1024) {
-    alert(`Ukuran file terlalu besar! Maksimal ${maxSizeInMB}MB.`);
-    target.value = "";
-    return;
-  }
-  // Proses Baca File dengan Error Handling
+  const options = {
+    maxSizeMB: 1,
+    maxWidthOrHeight: 1920,
+    useWebWorker: true,
+  };
+
   try {
-    const reader = new FileReader();
+    isCompressing.value = true; // Nyalakan loading
 
-    // Tangkap jika browser HP gagal membaca file (corrupt/unsupported)
-    reader.onerror = () => {
-      errorMessage.value =
-        "Gagal membaca foto. Pastikan format gambar normal atau coba ambil foto ulang.";
-      target.value = "";
-    };
+    const compressedFile = await imageCompression(file, options);
 
-    reader.onload = (event) => {
-      if (target === ktmInput.value) {
-        form.ktm = file;
-        urls.ktm = event.target?.result as string;
-      } else {
-        form.verification = file;
-        urls.verification = event.target?.result as string;
-      }
-    };
-
-    reader.readAsDataURL(file);
+    if (target === ktmInput.value) {
+      form.ktm = compressedFile;
+      urls.ktm = URL.createObjectURL(compressedFile); // Tampilkan preview instan
+    } else {
+      form.verification = compressedFile;
+      urls.verification = URL.createObjectURL(compressedFile); // Tampilkan preview instan
+    }
   } catch (error) {
     errorMessage.value =
-      "Terjadi kesalahan sistem pada perangkat Anda. Coba *refresh* halaman.";
+      "Gagal mengompres gambar. Pastikan format gambar didukung.";
+  } finally {
+    isCompressing.value = false; // Matikan loading
+    target.value = ""; // Reset input agar bisa pilih file yang sama lagi jika perlu
   }
 };
 
@@ -86,8 +80,7 @@ const submit = () => {
         } else if (errors.verification) {
           errorMessage.value = `Wajah: ${errors.verification}`;
         } else {
-          errorMessage.value =
-            "Server gagal memproses gambar. Coba lagi dalam beberapa saat.";
+          errorMessage.value = "Server gagal memproses gambar";
         }
       },
     });
@@ -96,6 +89,12 @@ const submit = () => {
 </script>
 
 <template>
+  <div
+    v-if="isCompressing"
+    class="text-center text-white font-bold animate-pulse mb-4"
+  >
+    Sedang mengoptimasi gambar... Mohon tunggu.
+  </div>
   <input
     ref="ktmInput"
     type="file"
